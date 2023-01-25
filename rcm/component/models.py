@@ -3,6 +3,7 @@ from django.core.exceptions import ValidationError
 
 # Component model based on Edge-Weighted Directed Acyclic Graph
 
+
 class AbstractComponent(models.Model):
     name = models.CharField(
         max_length=20,
@@ -13,7 +14,7 @@ class Component(AbstractComponent):
     class TypeTag(models.IntegerChoices):
         Part = 0
         Assembly = 1
-    
+
     type_tag = models.IntegerField(
         choices=TypeTag.choices,
     )
@@ -44,13 +45,14 @@ class Component(AbstractComponent):
             return sum(
                 list(
                     map(
-                        lambda x: 
+                        lambda x:
                         x.to_component.get_number_of_parts() * x.weight,
-                         ComponentRelation.objects.filter(from_component = self),
+                        ComponentRelation.objects.filter(from_component=self),
                     )
                 )
             )
     get_number_of_parts.short_description = "Number of Parts"
+
 
 class ComponentRelation(models.Model):
     from_component = models.ForeignKey(
@@ -104,12 +106,14 @@ class ComponentRelation(models.Model):
         super().clean()
         # Validate no self-referencing node, and acyclicity
         if not self.is_acyclic():
-            # todo Present cyclic path for convenience 
-            raise ValidationError("Cyclic component definition is not permitted.")
-        
+            # todo Present cyclic path for convenience
+            raise ValidationError(
+                "Cyclic component definition is not permitted.")
+
         # Validate if the type of parent component is Assembly
         if not self.is_from_assembly():
-            raise ValidationError("Type of parent component should be Assembly, not Part.")
+            raise ValidationError(
+                "Type of parent component should be Assembly, not Part.")
 
     def save(self, *args, **kwargs) -> None:
         self.full_clean()

@@ -4,6 +4,7 @@ from django import forms
 from django.core.exceptions import ValidationError
 from .models import Component
 
+
 class ComponentForm(forms.ModelForm):
     class Meta:
         model = Component
@@ -20,9 +21,11 @@ class ComponentForm(forms.ModelForm):
             if sub_components != None:
                 raise forms.ValidationError("Part can't have sub_components.")
             elif assembly_only_data != "":
-                raise forms.ValidationError("Part can't have assembly only data.")
+                raise forms.ValidationError(
+                    "Part can't have assembly only data.")
         elif type_tag == Component.TypeTag.Assembly:
             if part_only_data != "":
-                raise forms.ValidationError("Assembly can't have part only data.")
+                raise forms.ValidationError(
+                    "Assembly can't have part only data.")
 
         return cleaned_data
